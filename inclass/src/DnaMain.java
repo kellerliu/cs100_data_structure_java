@@ -1,4 +1,5 @@
 import java.util.HashSet;
+import java.util.*;
 
 
 public class DnaMain {
@@ -9,13 +10,13 @@ public class DnaMain {
 		//funString.
 		
 		ArrayList<String> list =new ArrayList<String>();
-		ArrayList<DnaStrand> list2 =new ArrayList<DnaStrand>();
+		ArrayList<DNAstrand> list2 =new ArrayList<DNAstrand>();
 		list2.add(a);
 		list2.add(b);
 		list2.remove(a);
 		
 		boolean hasAnA =list2.contains(a);
-		for(int i)
+
 		for(DNAstrand current:list2){
 			
 		}
@@ -28,7 +29,7 @@ public class DnaMain {
 		//should print out 2.
 		
 		
-		HashMap<String.DNAstrand> map =new HashMap<String, DNAstrand>();
+		HashMap<String, DNAstrand> map =new HashMap<String, DNAstrand>();
 		map.put("qqq",b);
 		map.put("qqq",a);
 		map.get("qqq");

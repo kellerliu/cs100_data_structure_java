@@ -1,12 +1,9 @@
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
+
 import java.io.IOException;
-import java.nio.channels.*;
-import java.nio.*;
-import java.io.*;
+
 import java.util.*;
 
-import javax.swing.JFileChooser;
+
 
 public class BurrowsWheeler {
     

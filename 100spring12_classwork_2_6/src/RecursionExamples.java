@@ -32,7 +32,6 @@ public class RecursionExamples {
 
 		if (n % 2 != 0) {
 			return -1;
-
 		}
 		int power = findPowerOfTwo(n / 2);
 		if (power == -1) {
@@ -41,7 +40,6 @@ public class RecursionExamples {
 
 		power++;
 		return power;
-
 	}
 
 	public File getADirectory() {
@@ -75,23 +73,18 @@ public class RecursionExamples {
 
 	public File findBig(File dir) {
 		File[] dirContents = dir.listFiles();
-		System.out.println(tab + "**:" + dir.getPath());
+		System.out.println("\t**:" + dir.getPath());
 		File biggestFill= null;
 		for (File f : dirContents) {
 			if (f.isDirectory()) {
-				
-				
-				
 				return findBig(f);
 			} else {
 				if (f.length() > THRESHOLD) {
-					
-									
-					
 					return f;
 				}
 			}
 		}
+		return biggestFill;
 	}
 	
 	
@@ -123,7 +116,7 @@ public class RecursionExamples {
 		//		+ ex.findPowerOfTwo(numToTest));
 
 		File selectedDirectory = ex.getADirectory();
-		 ex.findBig(selectedDirectory, "");
+		 ex.findBig(selectedDirectory);
 	}
 
 }
