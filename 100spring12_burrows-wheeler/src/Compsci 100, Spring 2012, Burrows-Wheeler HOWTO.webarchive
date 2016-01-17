@@ -1,0 +1,364 @@
+bplist00“_WebMainResource_WebSubresources’	
+_WebResourceTextEncodingName_WebResourceFrameName^WebResourceURL_WebResourceData_WebResourceMIMETypeUUTF-8P_Hhttp://www.cs.duke.edu/courses/spring12/cps100/assign/burrows/howto.htmlO$‡<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"><html><head>
+    <title>Compsci 100, Spring 2012, Burrows-Wheeler HOWTO</title>
+    <link rel="stylesheet" type="text/css" href="http://www.cs.duke.edu/courses/common/compsci.css"> 
+    <link rel="stylesheet" type="text/css" href="../assign.css">
+  </head>
+
+  <body>
+    <h1>Compsci 100, Spring 2012, Burrows-Wheeler HOWTO</h1>
+
+<h3>Understanding Burrows-Wheeler</h3>
+
+This is an extra credit assignment, and therefore we'll be relying on your ability to do a little research to understand the BWT on your own.  This howto focuses on a few particular issues in integrating huffman...it does not really describe the transform itself.
+<p>
+One <a href="http://marknelson.us/1996/09/01/bwt">fairly detailed explanation of the BWT and its use in compression is here</a>.  You also may find this <a href="http://en.wikipedia.org/wiki/Burrows-Wheeler_transform">this
+Wikipedia entry</a> useful.
+</p><p>
+You'll need both a high-level understanding of how BWT works to implement
+this project, but also expend to do some amount of work modifying your existing huffman code to easily accept this new transformation (that's what's described below).
+</p><p>
+You're also given a class <a href="code/BurrowsWheeler.java"><code>BurrowsWheeler</code></a>
+with <b>TODO:</b> annotations indicating where you must add code to make
+      that class work as intended. There's more discussion about this
+      below.
+</p><p>
+<a name="transform"></a></p><h3><a name="transform">BWT encoding/compression</a></h3>
+
+
+Below is the body of my method that compresses using Huffman
+Coding/Compression from the previous assignment. This isn't how I
+originally wrote it, but it represents a refactoring of the code so that
+separate methods are used to
+write the header and the compressed bits. This separation/refactoring
+makes it simpler to use the existing code
+in doing the Burrows-Wheeler transform. The idea isn't to make your code
+    look like this, but to understand this code in the context of the
+    block transform.
+<p>
+</p><xmp class="code">
+   public int compress(InputStream in, OutputStream out, boolean force) throws IOException {
+</xmp>
+<xmp class="code1">        
+        BitOutputStream bos = new BitOutputStream(out);
+        BitInputStream bis = new BitInputStream(in);
+        int bitCount = 0;
+</xmp>
+<xmp class="code2">
+        TreeNode root = getTree();
+        makeMap(root,"");     
+        bitCount += writeHeader(bos,root);
+        bitCount += writeCompressed(bis,bos);
+        bos.flush();
+        return bitCount;
+</xmp>
+<xmp class="code">
+    }
+</xmp>
+<p>
+The refactoring broke out creating the tree and codings for compression,
+      then writing the header, and finally writing the 
+      bits for compression. Recall that the method <code>compress</code>
+      is above is called from the GUI/View only <em>after</em> chunks
+      have
+been counted via the method <code>preprocessCompress</code>. This makes
+      it possible to create the tree and the map from the counts.
+</p><p>
+The basic idea for doing the Burrows-Wheeler transform (BWT) is shown
+below, leveraging the existing Huffman Compression code as indicated by
+the color/font of the different sections.
+</p><p>
+
+
+
+</p><xmp class="code">
+public int transform(InputStream in, OutputStream out) throws IOException{
+</xmp>
+<xmp class="code1">
+        BitInputStream bis = new BitInputStream(in);
+        BitOutputStream bos = new BitOutputStream(out);
+        int bitCount = 0;
+</xmp>
+<xmp class="code">
+        BurrowsWheeler bw = new BurrowsWheeler();
+        while (true){
+            char[] chunk = bw.transform(bis);
+            if (chunk.length == 0) break;
+            chunk = bw.mtf(chunk);
+            byte[] array = new byte[chunk.length];
+            for(int k=0; k < array.length; k++){
+                array[k] = (byte) chunk[k];
+            }
+            ByteArrayInputStream bas = new ByteArrayInputStream(array);
+            preprocessCompress(bas);
+           
+            int first = bw.getFirst();
+            // write header information as appriopriate, e.g.,
+            // magic-number and first
+</xmp>
+<xmp class="code2">
+            TreeNode root = getTree();
+            makeMap(root,"");
+            BitInputStream comp = new BitInputStream(new ByteArrayInputStream(array));
+            bitCount += writeBWTHeader(bos,root);
+            bitCount+=writeCompressed(comp,bos);
+</xmp>
+<xmp class="code">
+        }
+        bos.flush();
+        return bitCount;
+</xmp>
+<p>
+One of the key ideas here is using a <code>ByteArrayInputStream</code>
+      to adapt the BWT data into a format that the existing Huffman code
+      supports. This type of stream can be constructed from a
+      <code>byte[]</code> array as shown --- once the array has been
+      thus converted into a stream the existing stream-based methods of
+      the Huffman program/code can be used.
+</p><p>
+Note that two streams are created in the code above: one to count the
+      occurrence of each chunk via <code>preprocessCompress</code> and
+      one to actually do the compression. This mirrors the original
+      Huffman program where one stream was passed to
+      <code>preprocessCompress</code> and another to the
+      <code>compress</code> method. If you look at the code
+in <a href="code/HuffViewer.java"><code>HuffViewer</code></a> you'll see
+      the two streams created similarly to the two streams in the method
+      <code>transform</code> above.
+</p><p>
+<a name="untransform"></a></p><h3><a name="untransform">BWT decoding/uncompression</a></h3>
+
+You should write a different magic number at the beginning of a
+compressed file if it's transformed/compressed rather than simply
+compressed by Huffman Coding. The new <a href="code/IHuffConstants.java"><code>IHuffConstants</code></a> class
+has a <tt>WHEELER_MAGIC</tt> value useful for this purpose.
+<p>
+When uncompressing you reverse the process used in compressing: read
+      compressed data, use the unmove-to-front method
+      <code>BurrowsWheeler.unmtf</code> followed by the
+<code>BurrowsWheeler.decode</code> method which reverses the original
+      transform. In my BWT compressed file I wrote a magic number and
+      the <em>first index</em> at the beginning of every block. This
+      makes it easy to determine if there's another block, your code can
+      read to find the magic number and if it's not there return an
+      empty/zero-length block. It is possible to avoid writing the magic
+      number at the beginning of every block, but you'll need to write
+the value of <em>first index</em> and then read it when uncompressing.
+</p><p>
+As in the original Huffman assignment you'll need to store the tree or
+the counts used to create the tree since the tree is needed to
+uncompress the Huff-encoded data. Here's the code I used in my
+BWT <code>untransform</code> method.
+</p><p>
+</p><xmp class="code">
+// already read WHEELER_MAGIC before calling this method the first time
+
+public int untransform(BitInputStream bis, OutputStream out) throws IOException{
+        BurrowsWheeler bw = new BurrowsWheeler();
+        int chunkCount = 1;
+        while (true){
+           int first = bis.readBits(BITS_PER_INT);  // read first index
+           if (first == -1){
+               myViewer.showError("problem getting first index");
+               break;
+           }
+
+           ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
+           BitOutputStream temp = new BitOutputStream(byteOut);
+           doOriginalHuffUncompressAfterMagic(bis,temp);
+           byte[] array = byteOut.toByteArray();
+           char[] chunks = new char[array.length];
+           for(int k=0; k < chunks.length; k++){
+               byte b = array[k];
+               char bp = (char) (b & 0xff);
+               chunks[k] = bp;
+           }
+
+
+           // TODO: write code here:
+           // now that you have a char[] first call unmove-to-front
+           // then call decode to untransform (you'll need first to do this)
+           // then write out each char to the OutputStream out that's a parameter
+
+           int header = bis.readBits(BITS_PER_INT);
+           if (header == WHEELER_MAGIC){
+               chunkCount++;
+           }
+           else {
+               break;
+           }
+        }
+        out.flush();
+        return chunkCount;
+    }
+</xmp>
+<p>
+I use a <code>ByteArrayOutputStream</code> to write the compressed data
+      to, then convert the <code>byte[]</code> array associated with the
+      stream to a <code>char[]</code> array which facilitates using the
+      <code>BurrowsWheeler</code>
+code that deals with <code>char[]</code> arrays. I didn't have a method
+originally named <code>doOriginalHuffUncompressAfterMagic</code> but I
+      could have -- this simply reads the header and the bits and writes
+      the uncompressed file -- exactly as in the original Huffman
+      assignment but this time the output goes to the
+      <code>ByteArrayOutputStream</code> instead of to a file.
+</p><p>
+Your code should not necessarily look like my code, but the code above
+      shows how to use a <code>ByteArrayOutputStream</code> to get the
+      uncompressed data using already-written (but perhaps refactored)
+      code from Huff. The code above assumes that each block compressed
+      using BWT is preceeded by both a magic number and the <em>first
+	index</em> required in the BWT untransform process.
+  
+
+</p></body></html>Ytext/html¢‘_WebResourceResponse_1http://www.cs.duke.edu/courses/common/compsci.cssO)bplist00‘fgX$versionX$objectsY$archiverT$top Ü†Ø"()012JKLMNOPQRSTUVWXYZ[\`aU$null›	
+ !R$6S$10R$2R$7R$3S$11R$8V$classR$4R$9R$0R$5R$1ÄÄÄ ÄÄÄÄ Ä”#$%&[NS.relativeWNS.baseÄÄÄ _1http://www.cs.duke.edu/courses/common/compsci.css“*+,-Z$classnameX$classesUNSURL¢./UNSURLXNSObject#Aµ@•_2{>»”3456@WNS.keysZNS.objectsÄ©789:;<=>?Ä	Ä
+ÄÄÄÄÄÄÄ©ABCDEFGHIÄÄÄÄÄÄÄÄÄVServerZConnection\Content-Type]Last-Modified]Accept-RangesTDate^Content-LengthZKeep-AliveTEtagVApacheZKeep-AliveXtext/css_Wed, 07 Oct 2009 10:09:39 GMTUbytes_Thu, 19 Apr 2012 19:56:13 GMTT1082_timeout=3, max=99_"16bafc1-43a-475558b7f72f4"“*+]^_NSMutableDictionary£]_/\NSDictionary:“*+bc_NSHTTPURLResponse£de/_NSHTTPURLResponse]NSURLResponse_NSKeyedArchiver—hi_WebResourceResponseÄ    # - 2 7 X ^ y | Ä É Ü â ç ê ó ö ù † £ ¶ ® ™ ¨ Æ ∞ ≤ ¥ ∂ ∏ ∫ º æ ≈ — Ÿ € › ﬂ#,25;DMOV^ikuwy{}ÅÉÖáëìïóôõùü°£™µ¬–ﬁ„Ú˝	=Cch|öüµπ∆…Œ‚Ê˙3             j              5O:
+
+
+XMP.code { color: blue; }
+XMP.code1 { color: green; }
+XMP.code2 { color: red; }
+PRE.code { color: blue; }
+PRE.run  { color: green; }
+CODE { color:blue; }
+span.code{
+ color: blue;
+ font-family: monospace;
+}
+
+span.bigo {
+ color: red;
+ font-family: monospace;
+}
+
+PRE.small { font-size: x-small}
+TABLE {
+   border: 1px solid black;
+   border-collapse: collapse;
+   empty-cells: show;
+}
+
+TABLE.noborder{
+   border: 0px solid white;
+}
+TD.noborder{
+   border: 0px solid white;
+}
+TD{
+   border: 1px solid black;
+   padding: 3px;
+}
+TH{
+   border: 1px solid black;
+   padding: 5px;
+}
+
+.large {
+ width: 25pt;
+ height: 25pt;
+}
+
+.medium{
+ width : 15pt;
+ height: 15pt;
+}
+
+.assign {
+ background-color: #33FFFF;
+ padding: 1px;
+}
+
+.reading {
+ background-color: #CC9966;
+ padding: 1px;
+}
+
+.announce {
+ background-color: #FF66FF;
+ padding: 1px;
+}
+
+.notes {
+ background-color: #FFFF99;
+ padding: 1px;
+}
+
+.coding {
+ background-color: #66FF99;
+ padding: 1px;
+}
+
+.human {
+ background-color: #ff9999;
+}
+
+.computer {
+ background-color: #66cccc;
+}
+
+.command {
+ font-weight: bold;
+ font-family: courier;
+}
+Xtext/css‘_@http://www.cs.duke.edu/courses/spring12/cps100/assign/assign.cssO7bplist00‘fgX$versionX$objectsY$archiverT$top Ü†Ø"()012JKLMNOPQRSTUVWXYZ[\`aU$null›	
+ !R$6S$10R$2R$7R$3S$11R$8V$classR$4R$9R$0R$5R$1ÄÄÄ ÄÄÄÄ Ä”#$%&[NS.relativeWNS.baseÄÄÄ _@http://www.cs.duke.edu/courses/spring12/cps100/assign/assign.css“*+,-Z$classnameX$classesUNSURL¢./UNSURLXNSObject#Aµ?ë6h‰»”3456@WNS.keysZNS.objectsÄ©789:;<=>?Ä	Ä
+ÄÄÄÄÄÄÄ©ABCDEFGHIÄÄÄÄÄÄÄÄÄVServer\Content-TypeTEtag]Last-ModifiedTDate]Accept-Ranges^Content-LengthZKeep-AliveZConnectionVApacheXtext/css_"47d2bc-324-4b6aaf83ec0e8"_Mon, 16 Jan 2012 20:22:12 GMT_Thu, 19 Apr 2012 00:17:16 GMTUbytesS804_timeout=3, max=100ZKeep-Alive“*+]^_NSMutableDictionary£]_/\NSDictionary$“*+bc_NSHTTPURLResponse£de/_NSHTTPURLResponse]NSURLResponse_NSKeyedArchiver—hi_WebResourceResponseÄ    # - 2 7 X ^ y | Ä É Ü â ç ê ó ö ù † £ ¶ ® ™ ¨ Æ ∞ ≤ ¥ ∂ ∏ ∫ º æ ≈ — Ÿ € › ﬂ"'2;ADJS\^emxzÑÜàäåéêíîñ†¢§¶®™¨Æ∞≤π∆ÀŸﬁÏ˚!>^~Ñàù®≠√«‘◊‹Ù(+A             j              CO$body {
+font: 100% verdana, arial, sans-serif;
+background-color: #E3E4FA;
+margin: 20px;
+}
+
+XMP.code { color: blue; }
+CODE{
+ color: blue;
+ font: Courier,Lucidatypewriter, monospace;
+ font-style: italic;
+}
+span.code{
+ color: blue;
+}
+
+.leftimage {
+  float: left;
+  padding: 10px;
+  margin: 10px;
+  border-style: solid;
+  border-color: black;
+  border-width: 1px;
+}
+
+.rightimage {
+  float: right;
+  padding: 10px;
+  margin: 10px;
+  border-style: solid;
+  border-color: black;
+  border-width: 1px;
+}
+
+TABLE {
+   border: 1px solid black;
+   border-collapse: collapse;
+   empty-cells: show;
+}
+
+TABLE.noborder{
+   border: 0px solid white;
+}
+TD.noborder{
+   border: 0px solid white;
+}
+TD{
+   border: 1px solid black;
+   padding: 3px;
+}
+TH{
+   border: 1px solid black;
+   padding: 5px;
+}
+
+PRE.code { color: blue; }
+Xtext/css    1 < Z q Ä í ® Æ Ø ˙%ﬁ%Ë%Î%Ù&
+&>*k.©.≤.ª.˛396a                           6j

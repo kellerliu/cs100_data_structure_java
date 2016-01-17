@@ -1,0 +1,47 @@
+Name: Junfei Liu
+Start Date: 3/10/2012
+Complete Date: 3/12/2012
+Expected hours I spent:  8hrs
+Collaborate with Yuanjie Jin
+Use the website http://www.cs.duke.edu/csed/java/jdk1.6/ and Piazza as online resources
+
+Comment: 
+I think this is a good extension to practice writing help methods, such as how to define symmetry and winning of game.
+The recursion is a smart way of solving this problem, which keeps good track of the status of current and next move.
+
+Though my code gives the correct results, it runs fairly slow. Is there any good strategy to improve the speed?
+
+
+
+
+I think there is a mistake on the web page where it says "Similarly, there are 11 really different boards containing one X and one O if symmetry is taken into account, as shown below."
+
+ X | O |        X |   |      X |   | O     X |   |       X |   |       
+---+---+---    ---+---+---  ---+---+---   ---+---+---   ---+---+--- 
+   |   |          | O |        |   |         |   |         |   | O 
+---+---+---    ---+---+---  ---+---+---   ---+---+---   ---+---+--- 
+   |   |          |   |        |   |         |   | O       |   |   
+
+
+   | O |          |   | O   
+---+---+---    ---+---+--- 
+   | X |          | X |    
+---+---+---    ---+---+--- 
+   |   |          |   |    
+
+ 
+ O | X |          | X |           | X |            | X |    
+---+---+---    ---+---+---     ---+---+---      ---+---+--- 
+   |   |        O |   |           |   |            |   |    
+---+---+---    ---+---+---     ---+---+---      ---+---+--- 
+   |   |          |   |         O |   |            | O |   
+   
+   
+   
+However, I think there should be one more case:
+  
+   | X |         
+---+---+---    
+   | O |            
+---+---+---   
+   |   |          

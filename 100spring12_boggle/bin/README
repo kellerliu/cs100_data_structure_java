@@ -1,0 +1,13 @@
+Name: Junfei Liu
+Start Date: 3/19/2012
+Complete Date: 3/23/2012
+Expected hours I spent:  12+hrs
+Collaborate with Yuanjie Jin
+Use the website http://www.cs.duke.edu/csed/java/jdk1.6/ and Piazza as online resources
+
+Comment: 
+This is a highly complex assignment, given the number of classes in the package, and the inner relationship between these classes. 
+
+GoodWordOnBoardFinder is a good practice of recursion and backtracking.
+BoardFirstAutoPlayer also uses recursion and backtracking, but is even more complex, especially in order to keep good track of all the status in checking valid word or prefix.
+

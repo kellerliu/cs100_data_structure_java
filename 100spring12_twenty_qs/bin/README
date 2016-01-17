@@ -1,0 +1,14 @@
+Name: Junfei Liu
+Start Date: 3/24/2012
+Complete Date: 3/26/2012
+Expected hours I spent:  6hrs
+Collaborate with Yuanjie Jin
+Use the website http://www.cs.duke.edu/csed/java/jdk1.6/ and Piazza as online resources
+
+Comment: 
+This is a very lovely assignment, relatively easy but definitely a good practice of reading and writing files.
+
+Regarding the robustness of GUI coding:
+What if the player types in nothing, or clicks cancel, or even closes the dialog panel.
+Or, what if the player types in some info that is already in the tree?
+Should the code check these cases and be able to provide the player chances to correct these mistakes?

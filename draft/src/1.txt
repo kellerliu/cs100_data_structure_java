@@ -1,0 +1,60 @@
+public class DNAcgcount
+{
+    public double ratio(String dna){
+       double count=0;
+       if (dna.length()==0)
+    	   return 0;
+       else
+    	for(int i=0; i<dna.length(); i++){
+    	if (dna.charAt(i)=='g')
+    			count++;
+    	else if (dna.charAt(i)=='c')
+    	 	count++;}
+    	
+    	 	double ratio=count/dna.length();
+    	 	
+    	 	return ratio;   	 	
+    	 	// fill in code here
+    }
+    
+    //For testing purpose:
+    public static void main(String[] args) {
+
+		DNAcgcount x = new DNAcgcount();
+		System.out.println(x.ratio("agatc"));
+
+	}
+    
+    
+}
+
+
+
+
+public class AccessLevel {
+    public String canAccess(int[] rights, int minPermission) {
+       String access="";
+    	if (rights.length==0)
+    		return access;
+    		System.out.println(access);
+    	
+    		for(int i=0; i<rights.length;i++){
+    			if(rights[i]>=minPermission)
+    				access=access+"A";
+    				else 
+    					access=access+"D";
+        }
+    	
+    	System.out.println(access);
+    	return access;
+    	
+ }
+    
+    public static void main(String[] args) {
+
+		AccessLevel x = new AccessLevel();
+		System.out.println(x.canAccess("[0, 1, 2, 3, 4, 5 ] 2"));
+
+
+
+}

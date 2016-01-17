@@ -1,0 +1,36 @@
+AbstractAutoPlayer extends AbstractPlayer implements IAutoPlayer
+AbstractPlayer implements IPlayer
+BadAutoPlayer: an AbstractAutoPlayer that does nothing
+BadWordOnBoardFinder: bad example
+BinarySearchLexicon: use Collections.binarySearch index, O(logN), done coding
+BoardCell: define cell basis
+BoardFirstAutoPlayer: find all the possible words based on board, done coding
+BoggleBoard:define board basis
+BoggleBoardFactory: make lots of boards using board maker
+/100spring12_boggle/src/BoggleGUI.java
+BoggleMain: change BadWordOnBoardFinder to GoodWordOnBoardFinder
+BoggleScore:set rules of score, based on word length and board size
+/100spring12_boggle/src/BoggleStats.java
+/100spring12_boggle/src/Cube.java
+/100spring12_boggle/src/ExpandableList.java
+GoodWordOnBoardFinder: Done coding
+/100spring12_boggle/src/HumanPlayer.java
+
+IAutoPlayer extends IPlayer
+
+IBoardMaker: interface
+ILexicon:interface
+IPlayer: basic interface 
+/100spring12_boggle/src/IPlayerView.java
+IWordOnBoardFinder: interface
+
+LexiconBenchmark: COMPARE lexicon METHOD
+
+LexiconFirstAutoPlayer: change BadWordOnBoardFinder to GoodWordOnBoardFinder
+LexStatus: show the status of a string as prefix, word or not word
+SimpleLexicon:O(n), TreeSet search
+/100spring12_boggle/src/StandardBoardMaker.java
+/100spring12_boggle/src/StoppableReader.java
+TestLexicon: change simpleLexicon to binarySearchLexicon, worked
+TestWordFinder:	change badWordOnBoardFinder to GoodWordOnBoardFinder, worked
+TrieLexicon:		a given example of lexicon, used for  

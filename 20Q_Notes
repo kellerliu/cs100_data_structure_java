@@ -1,0 +1,43 @@
+reading from files, parsing a file
+writing to a file
+working with trees
+
+
+Add new info to the game:
+is it a lion?
+Does it have tusks?
+Save this new info.
+
+Use a scanner object
+-s.hasNestLine(), true or false
+-s.nextLine(),   gives you the next line
+
+pre-order: root-> left->right
+
+internal node.
+#Q:   it has children
+
+write to file, FileWriter
+- writer.write(sth you wanna write)
+
+use recursion again, root-> left-> right
+
+
+Instance variable:
+
+root node/ current node/ animalGameViewer object- interact with it/
+path to current spot in game, present yes->no->yes->yes...  
+to display when add new game/
+??
+
+- myView. setEnable the button, set true
+showMessage
+update() question
+
+getNewInfoLeaf, call when the leaf gets a no,
+it will call addnewquestion,"is it a lion",
+
+call get differentiator, addnewknowledge, "does it have tusks, if yes then the leaf, if no, then the new added leaf" 
+
+
+https://bitbucket.org/sandipagr/twenty-questions-animal/src/3e28d439ea07/src/sa/animal/AnimalGameModel.java

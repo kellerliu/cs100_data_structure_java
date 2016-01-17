@@ -1,0 +1,8 @@
+totally n words, take 10000,get m unique words. 
+
+p=p(m)/sum(p(m))    //m (1,n)
+
+
+
+p(m)=C 	m-1     *C m
+		9999       n

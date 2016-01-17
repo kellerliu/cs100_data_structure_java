@@ -1,0 +1,15 @@
+Name: Junfei Liu
+Start Date: 3/12/2012
+Complete Date: 3/15/2012
+Hours spent:  10hrs
+Collaborate with Yuanjie Jin
+Use the website http://www.cs.duke.edu/csed/java/jdk1.6/ and Piazza as online resources
+
+Comment: 
+The Tourney and WordLadder are relatively easy, while TournamentRanker and AllWordLadders are extension that are more difficult, especially AllWordLadders. 
+
+In solving AllWordLadders, I used the same strategy as introduced in NumberGame on Feb29's class, which tracks the status of the word list.
+
+However, the main problem with AllWordLadders is, although theoretically the methodology is correct, it is not efficient enough, and fail to pass #10.
+
+Will other data structure such as TreeSet help promote the efficiency of solving this problem?

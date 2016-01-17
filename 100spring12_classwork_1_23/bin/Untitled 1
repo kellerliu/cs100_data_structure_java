@@ -1,0 +1,30 @@
+{dad: [son1, son2,son3, daughter1]}
+
+
+Paternal 
+{ sonson1: son1 }
+{ son1: dad }
+{ son2: dad }
+{ son3: dad }
+{ daughter1: dad }
+
+Maternal
+{son1: mom1}
+{son2: mom2}
+{daughterdaughter1 : daughter1}
+
+Question (p1,p2)
+Queue [p1]
+
+Pop = p2
+
+Paternal.containKey(p1) -> Paternal.get(p1) push queue
+Maternal.containKey(p1) -> Maternal.get(p1) push queue
+
+public boolean 
+
+
+
+
+
+

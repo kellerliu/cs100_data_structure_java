@@ -1,0 +1,254 @@
+
+
+
+//package sa.animal;
+
+/**
+* Animal Game Logic
+* @author Sandip Agrawal
+*/
+import java.io.*;   
+import java.util.*;
+
+//import org.jdesktop.swingworker.SwingWorker;
+
+public class AnimalGameExample implements IAnimalModel {
+
+  private AnimalNode myRoot;
+  private AnimalNode myCurrentNode;
+  private ArrayList<String> myUpdateList;
+  private AnimalGameViewer myView;
+  
+  private static final String QUESTION = "#Q:";
+  private String noresp = "";
+ 
+  /**
+   * Construct the model though
+   * no game can be played until <code>initialize</code> is called.
+   */
+  public AnimalGameExample() {
+      myUpdateList = new ArrayList<String>();
+  }
+
+  /**
+   * Read file/url scanner that stores a game, this is done
+   * in a separate thread using the nested <code>AnimalReader</code> class.
+   * When that thread finishes it will call methods in the view
+   * to enable buttons and newgames and it will start a new game. The thread
+   * also initializes the root of the tree as stored in private instance fields.
+   */
+  public void initialize(Scanner r) {
+	    	myView.setEnabled(true);
+  }
+
+  /**
+   * Associate a view with this model.
+   * @param view is the view for this model
+   */
+  public void setView(AnimalGameViewer view) {
+      myView = view;
+  }
+
+  /**
+   * Write the current (possibly modified) game tree to the file
+   * in the parameter.
+   * @param writer is bound to a file and will be written to
+   */
+  public void write(FileWriter writer) {
+      doWrite(writer, myRoot);
+  }
+
+  private void doWrite(FileWriter writer, AnimalNode root) {
+      try {
+                      if (root.yesLink == null && root.noLink == null) {
+                              writer.write(root.info+"\n");
+                      } else {
+                              writer.write(QUESTION + root.info+"\n");
+                              doWrite(writer, root.yesLink);
+                              doWrite(writer, root.noLink);
+                      }
+              } catch (IOException e) {
+                      myView.showError("Couldn't write to file.");
+              }
+  }
+
+  /**
+       * Helper method to display a message to the view.
+       * 
+       * @param question
+       *            is String displayed in view
+       */
+  private void askQuestion(String question) {
+      myUpdateList.clear();
+      myUpdateList.add(question);
+      myView.update(myUpdateList);
+  }
+
+  /**
+   * Called by view when user presses YES or NO button in
+   * course of playing a game.
+   * @param yes is true iff user pressed yes (false if pressed no)
+   */
+  ArrayList<AnimalNode> disp=new ArrayList<AnimalNode>();
+  ArrayList<String> ans=new ArrayList<String>();
+  
+  public void processYesNo(boolean yes) {     
+      if (yes) {
+              disp.add(myCurrentNode);
+              ans.add("YES");
+          if(myCurrentNode.yesLink==null && myCurrentNode.noLink==null){
+              myView.showDialog("I win !!!");
+          }
+          else{
+              askQuestion(myCurrentNode.yesLink.info);
+               myCurrentNode=myCurrentNode.yesLink;
+          }
+         
+      } else {
+                disp.add(myCurrentNode);
+          ans.add("NO");
+           if(myCurrentNode.yesLink==null && myCurrentNode.noLink==null){
+               myUpdateList.clear();
+                      myUpdateList.add("I give up, What are you thinking of?");
+                      myUpdateList.add("");
+                      myUpdateList.add("Please phrase as 'Is it a rhinoceros'");
+                      myUpdateList.add("or 'Is it an easy course',i.e.,use a");
+                      myUpdateList.add("complete sentence in your question");
+                      myUpdateList.add("");
+                      for( int i =0;i<disp.size();i++){
+                      myUpdateList.add("You answered  "+ ans.get(i) +"  to " + disp.get(i).info);
+                      //myView.update(myUpdateList)
+                      }
+                      myView.update(myUpdateList);
+                      myView.getNewInfoLeaf();
+                      
+              }
+           
+           else{
+               askQuestion(myCurrentNode.noLink.info);
+               myCurrentNode=myCurrentNode.noLink;
+           }
+      }
+  
+  }
+
+  /**
+   * Receives user's response when computer guessed incorrectly, and
+   * uses the response to get a new question (by calling view) that
+   * differentiates what the computer guessed from what the user
+   * was thinking of.
+   * @param noResponse is what the user was thinking of 
+   */
+  public void addNewQuestion(String noResponse) {
+      noresp = noResponse;
+      myUpdateList.clear();
+      myUpdateList.add("To add new knowledge to the tree/list of questions");
+      myUpdateList.add("you must create a new question to differentiate");
+      myUpdateList.add("between the thing I guessed and the thing you");
+      myUpdateList.add("had in mind for the last answer");
+      myUpdateList.add("");
+      myUpdateList.add("What question has an YES answer for");
+      myUpdateList.add("               "+disp.get(disp.size()-1).info);
+      myUpdateList.add("and a NO answer for a ");
+      myUpdateList.add("                "+noResponse);
+      myView.update(myUpdateList);
+    //  myView.getDifferentiator("Read the main window," +"\n"+"then enter question:");
+      myView.getDifferentiator();
+
+  }
+
+  
+  
+  public void addNewKnowledge(String quest) {
+       AnimalNode entry= new AnimalNode(quest,null,null);
+       if(disp.get(disp.size()-2).yesLink==disp.get(disp.size()-1)){
+       disp.get(disp.size()-2).yesLink=entry;
+       entry.yesLink=disp.get(disp.size()-1);
+       entry.noLink= new AnimalNode(noresp,null,null);
+       }
+       else{
+               disp.get(disp.size()-2).noLink=entry;
+               entry.yesLink=disp.get(disp.size()-1);
+               entry.noLink= new AnimalNode(noresp,null,null);
+       }
+  }
+
+  public void newGame() {
+      myCurrentNode=myRoot;
+      disp.clear();
+      ans.clear();
+      myUpdateList.clear();
+      askQuestion(myCurrentNode.info);
+  }
+
+  /**
+   * This class does the work of reading a file in a separate thread.
+   * Particularly a good idea when the file is actually a URL and the reading
+   * is subject to the load on the current Internet connection.
+   * <P>
+   * Students will need to change this comment and modify the private
+   * <code>build</code> method which does the work of reading the tree.
+   * 
+   * @author ola
+   * 
+   */
+//  public class AnimalReader extends SwingWorker<AnimalNode, Integer> {
+//      private Scanner myScanner;
+//
+      private int myQuestionCount;
+//
+//      public AnimalReader(Scanner scan) {
+//          myScanner = scan;
+//          myQuestionCount = 0;
+//      }
+//
+//      /**
+//       * Called automatically when the <code>execute</code> method of this
+//       * worker is called -- then the work is done in a background thread.
+//       * 
+//       * @return the root of the tree read
+//       */
+//  //    @Override
+//      protected AnimalNode doInBackground() throws Exception {
+//          myRoot = build(myScanner);
+//          return myRoot;
+//      }
+//
+      private AnimalNode build(Scanner r) {
+          String line = null;
+          while ((line = r.nextLine()) != null) {
+              if (line.startsWith(QUESTION)) {
+                  String part= line.substring(3);
+                      myQuestionCount++;
+                      AnimalNode left= build(r);
+                      AnimalNode right= build(r);
+                      AnimalNode star= new AnimalNode(part,left,right);
+                      return star;
+              }
+              
+              else{
+                      AnimalNode last=new AnimalNode(line,null,null);
+                      return last;
+                      
+              }
+          }
+          return null;
+      }
+//
+//  //    @Override
+//      public void done() {
+//          myView.showMessage("tree reading finished, # questions: "
+//                  + myQuestionCount);
+//          myView.setEnabled(true);
+//          newGame();
+//      }
+//
+////      @Override
+//      protected void process(List<Integer> list) {
+//          myView.showMessage("# lines read " + list.get(list.size() - 1));
+//      }
+//
+//  }
+//
+//}
+}

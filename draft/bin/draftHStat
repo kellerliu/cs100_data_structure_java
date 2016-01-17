@@ -1,0 +1,33 @@
+import java.util.*;
+
+/**
+ * This is a skeleton program, you'll
+ * need to modify, either adding code in main
+ * or in functions called from main
+ * @author Junfei Liu
+ *
+ */
+
+public class HangmanStats {
+	public static void main(String[] args) {
+		HangmanFileLoader loader = new HangmanFileLoader();
+		loader.readFile("lowerwords.txt");
+		
+		HashSet<String> set = new HashSet<String>();
+		
+		for(int i=4;i<21;i++){
+		for(int k=0; k < 10000; k += 1) {
+			set.add(loader.getRandomWord(i));
+		}
+		System.out.printf("number of %d letter words = %d\n",i, set.size());
+		// "\n"  enter		//"%" insert   // "d" decimal
+		// HashSet no length but size
+		//System.out.printf("number of "+i+" letter words = "+set.size()+"\n");
+		//System.out.println("number of "+i+" letter words = "+set.size());
+		set.clear();
+		// the set make by inner loop will remain unless manipulated(cleared) 
+		//or redefined (move the HashSet<String> set = new HashSet<String>();)inside.
+		
+	}
+}
+}
