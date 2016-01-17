@@ -50,7 +50,6 @@ INDEX VERSION 1.127+/Users/jliu/github/cs100_data_structure_java/.metadata/.plug
 3856011051.index
 3345381321.index
 1074646718.index
-1261967840.index
 2678521682.index
 305763900.index
 2707540438.index

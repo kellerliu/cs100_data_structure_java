@@ -1,4 +1,4 @@
-import java.io.File;
+// APT7
 // http://www.cs.duke.edu/csed/newapt/circuits.html
 	
 public class Circuits {
